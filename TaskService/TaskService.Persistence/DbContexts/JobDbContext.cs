@@ -1,0 +1,207 @@
+﻿using System.Data;
+using Dapper;
+using Npgsql;
+using TaskService.Application.Arguments;
+using TaskService.Application.Interfaces;
+using TaskService.Application.Interfaces.DbContexts;
+using TaskService.Domain;
+using TaskService.Persistence.CustomException;
+
+namespace TaskService.Persistence.DbContexts;
+
+public class JobDbContext : IJobDbContext
+{
+    private readonly string _connectionString;
+    public JobDbContext(string connectionString)
+    {
+        this._connectionString = connectionString;
+    }    
+    
+    public IEnumerable<Workflow> GetWorkflows(GetJobsArgument args)
+    {
+        var sql = @"
+        SELECT 
+            j.Id, j.Name, j.Description,
+            je.WorkerId AS ExecutorId
+        FROM 
+            Jobs j
+        LEFT JOIN 
+            JobExecutors je ON j.Id = je.JobId
+        WHERE
+            (@startName IS NULL OR j.Name LIKE @startName || '%')
+        ORDER BY 
+            j.Name
+        OFFSET 
+            @Offset ROWS 
+        FETCH NEXT 
+            @PageSize ROWS ONLY";
+
+        var parameters = new {
+            startName = args.startName ?? "",
+            Offset = (args.page ?? 1 - 1) * (args.pageSize ?? 10),
+            PageSize = args.pageSize ?? 10
+        };
+        
+        var jobDict = new Dictionary<Guid, Workflow>();
+
+        using (var connection = new NpgsqlConnection(_connectionString))
+        {
+            var jobs = connection.Query<Job, Guid?, Workflow>(
+                sql,
+                (job, executorId) => 
+                {
+                    if (!jobDict.TryGetValue(job.Id, out var workflow))
+                    {
+                        workflow = new Workflow(job, new List<Executor>());
+                        jobDict.Add(workflow.job.Id, workflow);
+                    }
+                    
+                    if (executorId.HasValue && !workflow.Contains(executorId.Value))
+                    {
+                        workflow.AddExecutor(new Executor(executorId.Value));
+                    }
+        
+                    return workflow;
+                },
+                parameters,
+                splitOn: "ExecutorId"  
+            ).AsList();  
+    
+            return jobDict.Values;
+        }
+    }
+
+    public Workflow? GetWorkflowById(Guid id)
+    {
+        const string sql = @"
+        SELECT 
+            j.Id, j.Name, j.Description,
+            je.WorkerId AS ExecutorId
+        FROM 
+            Jobs j
+        LEFT JOIN 
+            JobExecutors je ON j.Id = je.JobId
+        WHERE 
+            j.Id = @id";
+
+        using (var connection = new NpgsqlConnection(_connectionString))
+        {
+            var jobDict = new Dictionary<Guid, Workflow>();
+            
+            var jobs = connection.Query<Job, Guid?, Workflow>(
+                sql,
+                (job, executorId) => 
+                {
+                    if (!jobDict.TryGetValue(job.Id, out var workflow))
+                    {
+                        workflow = new Workflow(job, new List<Executor>());
+                        jobDict.Add(workflow.job.Id, workflow);
+                    }
+                    
+                    if (executorId.HasValue && !workflow.Contains(executorId.Value))
+                    {
+                        workflow.AddExecutor(new Executor(executorId.Value));
+                    }
+        
+                    return workflow;
+                },
+                new { id },
+                splitOn: "ExecutorId");
+                
+            return jobDict.Values.FirstOrDefault();
+        }
+    }
+
+    public Guid CreateJob(NewJob job)
+    {
+        const string insertJobSql =@"
+        INSERT INTO Jobs (Name, Description)
+        VALUES (@Name, @Description)
+        RETURNING Id";
+
+        using (var connection = new NpgsqlConnection(_connectionString))
+        {
+            var id = connection.ExecuteScalar<Guid>(insertJobSql, new 
+            {
+                job.Name,
+                job.Description
+            });
+            return id;
+        }
+    }
+
+    public void UpdateJob(Job job)
+    {
+        const string updateJobSql = @"
+            UPDATE Jobs 
+            SET Name = @Name, 
+                Description = @Description
+            WHERE Id = @Id";
+
+        using (var connection = new NpgsqlConnection(_connectionString)){
+            connection.Execute(updateJobSql, new
+            {
+                job.Id,
+                job.Name,
+                job.Description
+            });
+        }
+    }
+
+    public void DeleteJob(Guid id)
+    {
+        const string sqlDeleteJob = "DELETE FROM Jobs WHERE Id = @Id";
+
+        using (var connection = new NpgsqlConnection(_connectionString))
+        {
+            connection.Execute(sqlDeleteJob, new { Id = id });
+        }
+    }
+
+    public void AssignExecutor(Guid jobId, Guid executorId)
+    {
+        const string sql = @"
+        INSERT INTO JobExecutors (JobId, WorkerId)
+        VALUES (@JobId, @WorkerId)
+        ON CONFLICT (JobId, WorkerId) DO NOTHING";
+
+        using (var connection = new NpgsqlConnection(_connectionString))
+        {
+            var result = connection.Execute(sql, new 
+            {
+                JobId = jobId,
+                WorkerId = executorId
+            });
+            
+            if (result == 0)
+            {
+                throw new ExistAlreadyException(
+                    $"Assignment already exists for job {jobId} and executor {executorId}");
+            }
+            
+        }
+    }
+
+    public bool JobExists(Guid jobId)
+    {
+        const string sql = "SELECT 1 FROM Jobs WHERE Id = @id";
+        using (var connection = new NpgsqlConnection(_connectionString))
+        {
+            return connection.ExecuteScalar<bool>(sql, new { id = jobId });
+        }
+    }
+
+    public bool ExecutorExists(Guid executorId)
+    {
+        const string sql = "SELECT 1 FROM Workers WHERE Id = @id";
+        using (var connection = new NpgsqlConnection(_connectionString))
+        {
+            return connection.ExecuteScalar<bool>(sql, new { id = executorId });
+        }
+    }
+
+    public void DeleteExecutor(Job job, Executor executor)
+    {
+        throw new NotImplementedException();
+    }
+}

@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "sVx+uTm9AnyVHfdbX8mXe0tq/BFSKDemBLUVz8mZnv2P+ftP2RfgF/e9hBvgGYb3F8sCfAARFL9nSxYjes4FIg==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Acer\\Desktop\\ArtsoftProject\\NotificationService\\NotificationService.Application\\NotificationService.Application.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Acer\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\9.0.8\\microsoft.extensions.dependencyinjection.9.0.8.nupkg.sha512",
+    "C:\\Users\\Acer\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\9.0.8\\microsoft.extensions.dependencyinjection.abstractions.9.0.8.nupkg.sha512"
+  ],
+  "logs": []
+}
