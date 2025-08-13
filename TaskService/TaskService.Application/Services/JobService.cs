@@ -1,4 +1,5 @@
 ﻿using TaskService.Application.Arguments;
+using TaskService.Application.CustomException;
 using TaskService.Application.Interfaces;
 using TaskService.Application.Interfaces.DbContexts;
 using TaskService.Application.Interfaces.Services;
@@ -10,12 +11,18 @@ namespace TaskService.Application.Services;
 public class JobService : IJobService, IJobEventPublisher
 {
     private IJobDbContext _jobDbContext;
+    
+    private INotificationSenderService _notificationSenderService;
+    
+    private IUserJwtTokenHttpService _userJwtTokenService;
 
     private event Action<Guid, EventType>  handleEventJob;
 
-    public JobService(IJobDbContext jobDbContext)
+    public JobService(IJobDbContext jobDbContext, INotificationSenderService notificationSenderService, IUserJwtTokenHttpService userJwtTokenService)
     {
         _jobDbContext = jobDbContext;
+        _notificationSenderService = notificationSenderService;
+        this._userJwtTokenService = userJwtTokenService;
     }
 
     public void Subscribe(Action<Guid, EventType> metod)
@@ -67,6 +74,15 @@ public class JobService : IJobService, IJobEventPublisher
         if (!_jobDbContext.ExecutorExists(executorId))
             throw new NotFoundException("Executor not found");
         _jobDbContext.AssignExecutor(jobId, executorId);
+        var workflow = _jobDbContext.GetWorkflowById(jobId);
+        if (workflow == null)
+            throw new InternalDbException("Not get job, but say what this exist");
+        var newNotification = new NewNotification(
+            _userJwtTokenService.UserId,
+            executorId,
+            $"Необходимо выполнить работу с названием: {workflow.job.Name}\n" +
+            $"Подробное описание: {workflow.job.Description}");
+        _notificationSenderService.SendNotification(newNotification);
         handleEventJob.Invoke(jobId, EventType.Assigned);
     }
     

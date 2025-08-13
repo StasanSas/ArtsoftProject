@@ -18,7 +18,7 @@ public class JwtPublicKeyService
         //ILogger<ExternalApiService> logger)
     {
         _httpClient = httpClientFactory.CreateClient("jwt");
-        IsLoadedKey = false;
+        IsLoadedKey = true;
         //_logger = logger;
         GetPublicKey();
     }

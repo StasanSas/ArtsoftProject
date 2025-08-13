@@ -4,11 +4,11 @@ using TaskService.Application.Interfaces.Services;
 
 namespace TaskService.WebApi.HttpServices;
 
-public class UserHttpService : IUserHttpService
+public class UserJwtTokenHttpService : IUserJwtTokenHttpService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public UserHttpService(IHttpContextAccessor httpContextAccessor) =>
+    public UserJwtTokenHttpService(IHttpContextAccessor httpContextAccessor) =>
         _httpContextAccessor = httpContextAccessor;
 
     public Guid UserId
@@ -26,5 +26,19 @@ public class UserHttpService : IUserHttpService
                 throw new NotCorrectFormatJwtToken("Not Valid Claim NameIdentifier");
             return userIdInGuidFormat;
         }
+    }
+    
+    public string GetTokenFromRequest()
+    {
+        var authHeader = _httpContextAccessor.HttpContext?
+            .Request.Headers["Authorization"].FirstOrDefault();
+
+        if (string.IsNullOrEmpty(authHeader))
+            throw new NotCorrectFormatJwtToken("Not contains Authorization header");
+
+        if (authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            return authHeader.Substring("Bearer ".Length).Trim();
+
+        throw new NotCorrectFormatJwtToken("Not start on Bearer");
     }
 }

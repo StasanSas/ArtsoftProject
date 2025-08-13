@@ -9,18 +9,18 @@ namespace TaskService.Application.Services;
 public class JobHistoryService : IJobHistoryService
 {
     private IJobHistoryDbContext _jobHistoryDbContext;
-    private IUserHttpService _userService;
+    private IUserJwtTokenHttpService _userJwtTokenService;
 
-    public JobHistoryService(IJobHistoryDbContext jobHistoryDbContext, IJobEventPublisher jobService, IUserHttpService userService)
+    public JobHistoryService(IJobHistoryDbContext jobHistoryDbContext, IJobEventPublisher jobService, IUserJwtTokenHttpService userJwtTokenService)
     {
         this._jobHistoryDbContext = jobHistoryDbContext;
         jobService.Subscribe(SetHistoryJobEvent);
-        this._userService = userService;
+        this._userJwtTokenService = userJwtTokenService;
     }
     
     public void SetHistoryJobEvent(Guid id, EventType eventType)
     {
-        var jobHistoryEvent = new NewJobHistoryEvent(id, eventType,  _userService.UserId);
+        var jobHistoryEvent = new NewJobHistoryEvent(id, eventType,  _userJwtTokenService.UserId);
         _jobHistoryDbContext.SetJobHistory(jobHistoryEvent);
     }
 

@@ -4,22 +4,34 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using TaskService.Application;
 using TaskService.Persistence;
+using TaskService.WebApi;
 using TaskService.WebApi.Clients;
 using TaskService.WebApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 builder.Services.AddHttpClient(); 
 builder.Services.AddCustomClients();
 builder.Services.AddSingleton<JwtPublicKeyService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException("Строка подключения 'DefaultConnection' не найдена в конфигурации.");
+}
 DbInitializer.Initialize(connectionString);
 builder.Services.AddDb(connectionString);
 
 builder.Services.AddApplication();
+builder.Services.AddWebServices();
 builder.Services.AddControllers();
 
 builder.Services.AddFluentValidationAutoValidation();
@@ -48,8 +60,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("TaskCorsPolicy", policy =>
+    {
+        policy.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
+app.UseCors("TaskCorsPolicy");
 using (var scope = app.Services.CreateScope())
 {
     var publicKeyService = scope.ServiceProvider.GetRequiredService<JwtPublicKeyService>();

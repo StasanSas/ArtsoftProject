@@ -18,7 +18,7 @@ public class CircuitBreakerHandlerFilter : IHttpMessageHandlerBuilderFilter
                 .HandleTransientHttpError()
                 .CircuitBreakerAsync(
                     handledEventsAllowedBeforeBreaking: 3,
-                    durationOfBreak: TimeSpan.FromSeconds(30)
+                    durationOfBreak: TimeSpan.FromSeconds(10)
                 );
             builder.AdditionalHandlers.Add(new PolicyHttpMessageHandler(policy));
         };

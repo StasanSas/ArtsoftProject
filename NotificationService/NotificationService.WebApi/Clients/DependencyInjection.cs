@@ -11,7 +11,7 @@ public static class DependencyInjection
         var amountAttempts = 3;
         services.AddHttpClient("jwt", client =>
             {
-                client.BaseAddress = new Uri("");
+                client.BaseAddress = new Uri("https://localhost:7245/");
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             })
             .AddTransientHttpErrorPolicy(policy => policy

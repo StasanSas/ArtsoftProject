@@ -3,20 +3,19 @@ using System.Net;
 using System.Text.Json;
 using TaskService.Persistence.CustomException;
 
-namespace TaskService.WebApi.Middleware;
+namespace TaskService.WebApi.Middlewares;
 
 public class CustomExceptionHandlerMiddleware
 {
     private readonly RequestDelegate _next;
-    //private readonly ILogger<ErrorHandlingMiddleware> _logger;
+    private readonly ILogger<CustomExceptionHandlerMiddleware> _logger;
 
     public CustomExceptionHandlerMiddleware(
-            RequestDelegate next)
-        //ILogger<ErrorHandlingMiddleware> logger)
+        RequestDelegate next,
+        ILogger<CustomExceptionHandlerMiddleware> logger)
     {
         _next = next;
-        //_logger = logger;
-
+        _logger = logger;
     }
     
     public async Task Invoke(HttpContext context)
@@ -27,14 +26,14 @@ public class CustomExceptionHandlerMiddleware
         }
         catch(Exception exception)
         {
-            await HandleExceptionAsync(context, exception);
+            await HandleExceptionAsync(context, exception, context);
         }
     }
     
-    private Task HandleExceptionAsync(HttpContext context, Exception exception)
+    private Task HandleExceptionAsync(HttpContext context, Exception exception, HttpContext httpContext)
     {
         HttpStatusCode code = HttpStatusCode.InternalServerError;
-        var result = string.Empty;
+        
         switch(exception)
         {
             case ValidationException:
@@ -47,15 +46,17 @@ public class CustomExceptionHandlerMiddleware
                 code = HttpStatusCode.Conflict;
                 break;
         }
+
+        _logger.LogError(
+            "Произошло исключение \n" +
+            $"Сообщение ошибки {exception.Message} \n" +
+            $"Стек ошибки {exception.StackTrace ?? "N\\A"} \n");
+
+        var result = JsonSerializer.Serialize(new { error = exception.Message });
+
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)code;
 
-        if (result == string.Empty)
-        {
-            result = JsonSerializer.Serialize(new { error = exception.Message });
-        }
-
         return context.Response.WriteAsync(result);
     }
-    
 }

@@ -1,5 +1,5 @@
-
 using ApiGateway;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Http;
 using Polly;
@@ -7,17 +7,40 @@ using Polly.Extensions.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddMemoryCache();
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.All;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
+builder.Services.AddMemoryCache();
 builder.Services.AddTransient<IHttpMessageHandlerBuilderFilter, CircuitBreakerHandlerFilter>();
 
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("GatewayCorsPolicy", policy =>
+    {
+        policy.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials(); 
+    });
+});
 var app = builder.Build();
-
+app.UseForwardedHeaders();
+app.UseCors("GatewayCorsPolicy");
 app.Use(async (context, next) =>
 {
+    if (context.WebSockets.IsWebSocketRequest)
+    {
+        await next();
+        return;
+    }
+
     var cache = context.RequestServices.GetRequiredService<IMemoryCache>();
     var cacheKey = context.Request.Path;
     
@@ -51,4 +74,3 @@ app.Use(async (context, next) =>
 app.MapReverseProxy();
 
 app.Run();
-

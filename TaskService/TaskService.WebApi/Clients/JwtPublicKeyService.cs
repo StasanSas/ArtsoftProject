@@ -13,15 +13,12 @@ public class JwtPublicKeyService
     private RsaSecurityKey _publicKey { get; set; }
 
     private bool IsLoadedKey { get; set; }
-    //private readonly ILogger<ExternalApiService> _logger;
 
     public JwtPublicKeyService(
         IHttpClientFactory httpClientFactory)
-        //ILogger<ExternalApiService> logger)
     {
         _httpClient = httpClientFactory.CreateClient("jwt");
-        IsLoadedKey = false;
-        //_logger = logger;
+        IsLoadedKey = true;
         GetPublicKey();
     }
 

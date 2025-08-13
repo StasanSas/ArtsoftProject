@@ -5,7 +5,7 @@ namespace NotificationService.WebApi
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddSenderNotification(
+        public static IServiceCollection AddWebSocketServices(
             this IServiceCollection services)
         {
             services.AddScoped<INotificationSender, NotificationSender>();
