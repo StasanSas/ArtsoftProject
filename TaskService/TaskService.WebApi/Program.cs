@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -10,6 +11,8 @@ using TaskService.Persistence;
 using TaskService.WebApi;
 using TaskService.WebApi.Clients;
 using TaskService.WebApi.Middleware;
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
 Log.Logger = new LoggerConfiguration()
@@ -64,7 +67,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("TaskCorsPolicy", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.SetIsOriginAllowed(_ => true)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();

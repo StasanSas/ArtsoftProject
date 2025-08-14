@@ -21,24 +21,25 @@ public class JobDbContext : IJobDbContext
     {
         var sql = @"
         SELECT 
-            j.Id, j.Name, j.Description,
-            je.WorkerId AS ExecutorId
-        FROM 
-            Jobs j
-        LEFT JOIN 
-            JobExecutors je ON j.Id = je.JobId
-        WHERE
-            (@startName IS NULL OR j.Name LIKE @startName || '%')
-        ORDER BY 
-            j.Name
-        OFFSET 
-            @Offset ROWS 
-        FETCH NEXT 
-            @PageSize ROWS ONLY";
+        j.Id, j.Name, j.Description, j.is_deleted As IsDeleted, 
+        je.worker_id AS ExecutorId
+    FROM 
+        jobs j
+    LEFT JOIN 
+        job_executors je ON j.Id = je.job_id AND je.is_deleted = FALSE
+    WHERE
+        j.is_deleted = FALSE
+        AND (@startName IS NULL OR j.Name LIKE @startName || '%')
+    ORDER BY 
+        j.Name
+    OFFSET 
+        @Offset ROWS 
+    FETCH NEXT 
+        @PageSize ROWS ONLY";
 
         var parameters = new {
             startName = args.startName ?? "",
-            Offset = (args.page ?? 1 - 1) * (args.pageSize ?? 10),
+            Offset = ((args.page - 1) ?? 0) * (args.pageSize ?? 10),
             PageSize = args.pageSize ?? 10
         };
         
@@ -74,15 +75,15 @@ public class JobDbContext : IJobDbContext
     public Workflow? GetWorkflowById(Guid id)
     {
         const string sql = @"
-        SELECT 
-            j.Id, j.Name, j.Description,
-            je.WorkerId AS ExecutorId
-        FROM 
-            Jobs j
-        LEFT JOIN 
-            JobExecutors je ON j.Id = je.JobId
-        WHERE 
-            j.Id = @id";
+    SELECT 
+        j.Id, j.Name, j.Description, j.is_deleted As IsDeleted,
+        je.worker_id AS ExecutorId
+    FROM 
+        jobs j
+    LEFT JOIN 
+        job_executors je ON j.Id = je.job_id AND je.is_deleted = FALSE
+    WHERE 
+        j.Id = @id AND j.is_deleted = FALSE";
 
         using (var connection = new NpgsqlConnection(_connectionString))
         {
@@ -115,7 +116,7 @@ public class JobDbContext : IJobDbContext
     public Guid CreateJob(NewJob job)
     {
         const string insertJobSql =@"
-        INSERT INTO Jobs (Name, Description)
+        INSERT INTO jobs (Name, Description)
         VALUES (@Name, @Description)
         RETURNING Id";
 
@@ -133,10 +134,10 @@ public class JobDbContext : IJobDbContext
     public void UpdateJob(Job job)
     {
         const string updateJobSql = @"
-            UPDATE Jobs 
-            SET Name = @Name, 
-                Description = @Description
-            WHERE Id = @Id";
+        UPDATE jobs 
+        SET Name = @Name, 
+            Description = @Description
+        WHERE Id = @Id AND is_deleted = FALSE";
 
         using (var connection = new NpgsqlConnection(_connectionString)){
             connection.Execute(updateJobSql, new
@@ -150,7 +151,7 @@ public class JobDbContext : IJobDbContext
 
     public void DeleteJob(Guid id)
     {
-        const string sqlDeleteJob = "DELETE FROM Jobs WHERE Id = @Id";
+        const string sqlDeleteJob = @"UPDATE jobs SET is_deleted = TRUE WHERE id = @id;";
 
         using (var connection = new NpgsqlConnection(_connectionString))
         {
@@ -161,7 +162,7 @@ public class JobDbContext : IJobDbContext
     public void AssignExecutor(Guid jobId, Guid executorId)
     {
         const string sql = @"
-        INSERT INTO JobExecutors (JobId, WorkerId)
+        INSERT INTO jobExecutors (JobId, WorkerId)
         VALUES (@JobId, @WorkerId)
         ON CONFLICT (JobId, WorkerId) DO NOTHING";
 
@@ -184,21 +185,13 @@ public class JobDbContext : IJobDbContext
 
     public bool JobExists(Guid jobId)
     {
-        const string sql = "SELECT 1 FROM Jobs WHERE Id = @id";
+        const string sql = "SELECT 1 FROM jobs WHERE Id = @id AND is_deleted = FALSE";
         using (var connection = new NpgsqlConnection(_connectionString))
         {
             return connection.ExecuteScalar<bool>(sql, new { id = jobId });
         }
     }
-
-    public bool ExecutorExists(Guid executorId)
-    {
-        const string sql = "SELECT 1 FROM Workers WHERE Id = @id";
-        using (var connection = new NpgsqlConnection(_connectionString))
-        {
-            return connection.ExecuteScalar<bool>(sql, new { id = executorId });
-        }
-    }
+    
 
     public void DeleteExecutor(Job job, Executor executor)
     {

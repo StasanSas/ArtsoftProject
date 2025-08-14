@@ -28,6 +28,7 @@ public static class DependencyInjection
                     durationOfBreak: TimeSpan.FromSeconds(15)
                 )
             );
+        services.AddScoped<AuthHeaderHandler>();
         services.AddHttpClient("notification", client =>
             {
                 client.BaseAddress = new Uri("https://localhost:7091/");

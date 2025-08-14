@@ -10,12 +10,14 @@ public static class DbInitializer
         var createTableJobSql = @"CREATE TABLE IF NOT EXISTS jobs (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             name VARCHAR(100) NOT NULL,
-            description VARCHAR(500) NOT NULL
+            description VARCHAR(500) NOT NULL,
+            is_deleted BOOLEAN NOT NULL DEFAULT FALSE
         )";
 
         var createTableJobExecutorsSql = @"CREATE TABLE IF NOT EXISTS job_executors (
             job_id UUID NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
             worker_id UUID NOT NULL,
+            is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
             PRIMARY KEY (job_id, worker_id)
         )";
         
@@ -24,7 +26,7 @@ public static class DbInitializer
             name VARCHAR(50) NOT NULL
         )";
 
-        var fillTableRypeEvent = @"INSERT INTO event_type (id, name) VALUES 
+        var fillTableTypeEvent = @"INSERT INTO event_type (id, name) VALUES 
             (0, 'Created'),
             (1, 'Updated'),
             (2, 'Deleted'),
@@ -49,7 +51,7 @@ public static class DbInitializer
             connection.Execute(createTableJobSql, transaction: transaction);
             connection.Execute(createTableJobExecutorsSql, transaction: transaction);
             connection.Execute(createTableTypeEvent, transaction: transaction);
-            connection.Execute(fillTableRypeEvent, transaction: transaction);
+            connection.Execute(fillTableTypeEvent, transaction: transaction);
             connection.Execute(createTableHistoryEvent, transaction: transaction);
             
             transaction.Commit();

@@ -7,16 +7,15 @@ public class Job
     
     public string Description { get; private set; }
     
-    public Job(string name, string description)
-    {
-        Name = name;
-        Description = description;
-    }
+    public bool IsDeleted { get; private set; }
     
-    public Job(Guid id, string name, string description)
-        : this(name, description)
+    
+    public Job(Guid id, string name, string description, bool isDeleted)
     {
         Id = id;
+        Name = name;
+        Description = description;
+        IsDeleted = isDeleted;
     }
 
 }

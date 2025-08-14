@@ -11,9 +11,10 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(
         this IServiceCollection services)
     {
-        services.AddScoped<IJobService,JobService>();
+        services.AddScoped<JobService>();
+        services.AddScoped<IJobService>(sp => sp.GetRequiredService<JobService>());
+        services.AddScoped<IJobEventPublisher>(sp => sp.GetRequiredService<JobService>());
         services.AddScoped<IJobHistoryService, JobHistoryService>();
-        services.AddScoped<IJobEventPublisher, JobService>();
         return services;
     }
 }

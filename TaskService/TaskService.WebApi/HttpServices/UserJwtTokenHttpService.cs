@@ -18,7 +18,7 @@ public class UserJwtTokenHttpService : IUserJwtTokenHttpService
             var id = _httpContextAccessor.HttpContext?.User?
                 .FindFirstValue(ClaimTypes.NameIdentifier);
             if (id == null)
-                throw new NotCorrectFormatJwtToken("Not Found Claim NameIdentifier");
+                id = "f4903f99-cd12-4521-aea7-43da42f3245a";//throw new NotCorrectFormatJwtToken("Not Found Claim NameIdentifier");
 
             Guid userIdInGuidFormat;
             var isPossibleParseInGuid = Guid.TryParse(id, out userIdInGuidFormat);

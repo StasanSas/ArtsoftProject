@@ -46,7 +46,7 @@ public class JobService : IJobService, IJobEventPublisher
     public Guid CreateJob(NewJob job)
     {
         var id = _jobDbContext.CreateJob(job);
-        handleEventJob.Invoke(id, EventType.Created);
+        handleEventJob?.Invoke(id, EventType.Created);
         return id;
     }
     
@@ -55,7 +55,7 @@ public class JobService : IJobService, IJobEventPublisher
         if (!_jobDbContext.JobExists(job.Id))
             throw new NotFoundException("Job not found");
         _jobDbContext.UpdateJob(job);
-        handleEventJob.Invoke(job.Id, EventType.Updated);
+        handleEventJob?.Invoke(job.Id, EventType.Updated);
     }
     
     public void DeleteJob(Guid id)
@@ -63,7 +63,7 @@ public class JobService : IJobService, IJobEventPublisher
         if (!_jobDbContext.JobExists(id))
             throw new NotFoundException("Job not found");
         _jobDbContext.DeleteJob(id);
-        handleEventJob.Invoke(id, EventType.Deleted);
+        handleEventJob?.Invoke(id, EventType.Deleted);
     }
     
     public void AssignExecutor(Guid jobId, Guid executorId)
@@ -71,8 +71,8 @@ public class JobService : IJobService, IJobEventPublisher
         if (!_jobDbContext.JobExists(jobId))
             throw new NotFoundException("Job not found");
         
-        if (!_jobDbContext.ExecutorExists(executorId))
-            throw new NotFoundException("Executor not found");
+        //if (!_jobDbContext.ExecutorExists(executorId))
+            //throw new NotFoundException("Executor not found");
         _jobDbContext.AssignExecutor(jobId, executorId);
         var workflow = _jobDbContext.GetWorkflowById(jobId);
         if (workflow == null)
@@ -83,7 +83,7 @@ public class JobService : IJobService, IJobEventPublisher
             $"Необходимо выполнить работу с названием: {workflow.job.Name}\n" +
             $"Подробное описание: {workflow.job.Description}");
         _notificationSenderService.SendNotification(newNotification);
-        handleEventJob.Invoke(jobId, EventType.Assigned);
+        handleEventJob?.Invoke(jobId, EventType.Assigned);
     }
     
 }

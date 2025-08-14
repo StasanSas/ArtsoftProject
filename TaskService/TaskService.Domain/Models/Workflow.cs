@@ -14,6 +14,8 @@ public class Workflow
     public Workflow(Job job, IEnumerable<Executor> executors)
     {
         this.job = job;
+        _executors = new Dictionary<Guid, Executor>();
+
         foreach (var executor in executors)
         {
             _executors.Add(executor.Id, executor);

@@ -6,8 +6,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.WebApi"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.WebApi", "AuthService\AuthService.WebApi\AuthService.WebApi.csproj", "{14AD822C-A8E0-4A4F-B886-E64A29C31457}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskService.Test", "TaskService\TaskService.Test\TaskService.Test.csproj", "{DFBD6716-E41D-4AD9-97A5-5755638CA1ED}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "ApiGateway\ApiGateway\ApiGateway.csproj", "{88471CA3-9920-4405-A12B-B6E71A05D34F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskService.Domain", "TaskService\TaskService.Domain\TaskService.Domain.csproj", "{1D000E79-63B6-46F9-938D-8E9F9BE176C0}"
@@ -27,6 +25,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Application", "NotificationService\NotificationService.Application\NotificationService.Application.csproj", "{89CD3C83-CC4B-4B8E-8B1E-17FBAE1B3DBF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Persistence", "NotificationService\NotificationService.Persistence\NotificationService.Persistence.csproj", "{3252E032-BF27-4014-85E4-24E1611D154D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Test", "NotificationService\NotificationService.Test\NotificationService.Test.csproj", "{F06E6F9F-3CD0-4245-A4D0-B56A9D4BEF77}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,10 +49,6 @@ Global
 		{14AD822C-A8E0-4A4F-B886-E64A29C31457}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14AD822C-A8E0-4A4F-B886-E64A29C31457}.Release|Any CPU.Build.0 = Release|Any CPU
 		{14AD822C-A8E0-4A4F-B886-E64A29C31457}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{DFBD6716-E41D-4AD9-97A5-5755638CA1ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DFBD6716-E41D-4AD9-97A5-5755638CA1ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DFBD6716-E41D-4AD9-97A5-5755638CA1ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DFBD6716-E41D-4AD9-97A5-5755638CA1ED}.Release|Any CPU.Build.0 = Release|Any CPU
 		{88471CA3-9920-4405-A12B-B6E71A05D34F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{88471CA3-9920-4405-A12B-B6E71A05D34F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88471CA3-9920-4405-A12B-B6E71A05D34F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -94,5 +90,9 @@ Global
 		{3252E032-BF27-4014-85E4-24E1611D154D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3252E032-BF27-4014-85E4-24E1611D154D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3252E032-BF27-4014-85E4-24E1611D154D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F06E6F9F-3CD0-4245-A4D0-B56A9D4BEF77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F06E6F9F-3CD0-4245-A4D0-B56A9D4BEF77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F06E6F9F-3CD0-4245-A4D0-B56A9D4BEF77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F06E6F9F-3CD0-4245-A4D0-B56A9D4BEF77}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

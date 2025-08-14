@@ -1,4 +1,5 @@
-﻿using AuthService.Domain.Models;
+﻿using System;
+using AuthService.Domain.Models;
 
 namespace AuthService.Application.Interfaces;
 

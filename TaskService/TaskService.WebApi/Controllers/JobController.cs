@@ -57,8 +57,12 @@ public class JobController : ControllerBase
     public IActionResult Create([FromBody] JobDto jobDto)
     {
         var job = new NewJob(jobDto.Name, jobDto.Description);
-        var idJob = _jobService.CreateJob(job);
-        return CreatedAtAction(nameof(GetById), new { id = idJob});
+        var jobId = _jobService.CreateJob(job);
+        return CreatedAtAction(
+            actionName: nameof(GetById),
+            routeValues: new { id = jobId },      
+            value: new { Id = jobId }         
+        );
     }
 
     /// <summary>
@@ -70,7 +74,7 @@ public class JobController : ControllerBase
     [ProducesResponseType(404)]
     public IActionResult Update(Guid id, [FromBody] JobDto jobDto)
     {
-        var job = new Job(id, jobDto.Name, jobDto.Description);
+        var job = new Job(id, jobDto.Name, jobDto.Description, false);
         _jobService.UpdateJob(job);
         return NoContent();
     }

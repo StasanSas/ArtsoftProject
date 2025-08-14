@@ -1,4 +1,5 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using AuthService.Application.CustomException;
@@ -66,6 +67,7 @@ public class AuthService : IAuthService
 
         // Потом заиспользуем соль для проверки пароля, поэтому её тоже сохраняем
         var saltBase64 = Convert.ToBase64String(salt);
+        
         return $"{hashedPassword}:{saltBase64}";
     }
 
@@ -85,7 +87,7 @@ public class AuthService : IAuthService
                 password: transmittedPassword,
                 salt: salt,
                 prf: KeyDerivationPrf.HMACSHA512,
-                iterationCount: 100_000,
+                iterationCount: 10000,
                 numBytesRequested: 32
             )
         );
@@ -125,7 +127,7 @@ public class AuthService : IAuthService
     public string GetPublicKey()
     {
         using var rsa = RSA.Create();
-        rsa.ImportParameters(_publicKey.Rsa.ExportParameters(false));
+        rsa.ImportParameters(_publicKey.Parameters);
 
         // Экспорт в PEM формате
         return "-----BEGIN PUBLIC KEY-----\n" + 

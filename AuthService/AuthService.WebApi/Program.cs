@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -18,9 +19,13 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
 var rsa = RSA.Create(2048);
-var privateKey = new RsaSecurityKey(rsa);
-var publicKey = new RsaSecurityKey(rsa.ExportParameters(false));
+var keyId = Guid.NewGuid().ToString();
+
+var privateKey = new RsaSecurityKey(rsa) { KeyId = keyId };
+var publicKey = new RsaSecurityKey(rsa.ExportParameters(false)) { KeyId = keyId };
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrEmpty(connectionString))
@@ -29,7 +34,7 @@ if (string.IsNullOrEmpty(connectionString))
 }
 DbInitializer.Initialize(connectionString);
 builder.Services.AddDb(connectionString);
-builder.Services.AddApplication(privateKey, publicKey);
+builder.Services.AddApplication(publicKey, privateKey);
 builder.Services.AddControllers();
 
 builder.Services.AddFluentValidationAutoValidation();
@@ -43,10 +48,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidIssuer = "AuthService",
-            ValidateAudience = true,
-            ValidAudience = "ApiService",
+            ValidateAudience = false,
+            ValidateIssuer = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = publicKey // Используем публичный ключ
@@ -61,7 +64,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AuthCorsPolicy", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.SetIsOriginAllowed(_ => true)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();

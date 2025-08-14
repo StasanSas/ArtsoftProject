@@ -1,4 +1,6 @@
-﻿namespace AuthService.Application.CustomException;
+﻿using System;
+
+namespace AuthService.Application.CustomException;
 
 public class NotCorrectFormatJwtToken: Exception
 {

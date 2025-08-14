@@ -18,7 +18,6 @@ public interface IJobDbContext
     public void AssignExecutor(Guid jobId, Guid executorId);
 
     public bool JobExists(Guid jobId);
-
-    public bool ExecutorExists(Guid executorId);
+    
 
 }

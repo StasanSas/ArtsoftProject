@@ -5,6 +5,7 @@ using System.Text;
 using AuthService.Application.Interfaces;
 using AuthService.Domain.Models;
 using AuthService.WebApi.Dto;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using TaskService.WebApi.Mapping;
@@ -63,6 +64,7 @@ public class AuthController : ControllerBase
     }
     
     [HttpGet("me")]
+    [Authorize]
     [ProducesResponseType(typeof(UserInfoDto),200)]
     [ProducesResponseType(401)]
     public IActionResult GetInfoAboutMe()
