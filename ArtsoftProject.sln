@@ -26,7 +26,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Applica
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Persistence", "NotificationService\NotificationService.Persistence\NotificationService.Persistence.csproj", "{3252E032-BF27-4014-85E4-24E1611D154D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Test", "NotificationService\NotificationService.Test\NotificationService.Test.csproj", "{F06E6F9F-3CD0-4245-A4D0-B56A9D4BEF77}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.TestNotForUnit", "NotificationService.TestNotForUnit\NotificationService.TestNotForUnit.csproj", "{9E6E3F9E-C5BF-4686-81E4-1AF21320BFA5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -90,9 +90,9 @@ Global
 		{3252E032-BF27-4014-85E4-24E1611D154D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3252E032-BF27-4014-85E4-24E1611D154D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3252E032-BF27-4014-85E4-24E1611D154D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F06E6F9F-3CD0-4245-A4D0-B56A9D4BEF77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F06E6F9F-3CD0-4245-A4D0-B56A9D4BEF77}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F06E6F9F-3CD0-4245-A4D0-B56A9D4BEF77}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F06E6F9F-3CD0-4245-A4D0-B56A9D4BEF77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E6E3F9E-C5BF-4686-81E4-1AF21320BFA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E6E3F9E-C5BF-4686-81E4-1AF21320BFA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E6E3F9E-C5BF-4686-81E4-1AF21320BFA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E6E3F9E-C5BF-4686-81E4-1AF21320BFA5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

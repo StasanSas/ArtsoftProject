@@ -22,7 +22,7 @@ public class NotificationSenderService : INotificationSenderService
         var jsonContent = JsonSerializer.Serialize(newNotification);
         var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
         
-        var response = await _httpClient.PostAsync("", httpContent);
+        var response = await _httpClient.PostAsync("https://localhost:7091/api/notifications", httpContent);
         
         response.EnsureSuccessStatusCode();
     }

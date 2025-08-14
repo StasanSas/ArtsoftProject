@@ -18,7 +18,7 @@ public class JwtPublicKeyService
         //ILogger<ExternalApiService> logger)
     {
         _httpClient = httpClientFactory.CreateClient("jwt");
-        IsLoadedKey = true;
+        IsLoadedKey = false;
         //_logger = logger;
         GetPublicKey();
     }
@@ -32,7 +32,8 @@ public class JwtPublicKeyService
             var publicKeyInString = await response.Content.ReadAsStringAsync();
             using var rsa = RSA.Create();
             rsa.ImportFromPem(publicKeyInString);
-            _publicKey = new RsaSecurityKey(rsa);
+            RSAParameters rsaParams = rsa.ExportParameters(false); 
+            _publicKey = new RsaSecurityKey(rsaParams);
             IsLoadedKey = true;
         }
 

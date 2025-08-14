@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskService.Application.Arguments;
 using TaskService.Application.Interfaces.Services;
@@ -52,6 +53,7 @@ public class JobController : ControllerBase
     /// Создать новую задачу
     /// </summary>
     [HttpPost]
+    [Authorize]
     [ProducesResponseType(typeof(Guid), 201)]
     [ProducesResponseType(400)]
     public IActionResult Create([FromBody] JobDto jobDto)
@@ -68,7 +70,9 @@ public class JobController : ControllerBase
     /// <summary>
     /// Обновить существующую задачу
     /// </summary>
+    /// 
     [HttpPut("{id}")]
+    [Authorize]
     [ProducesResponseType(204)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
@@ -83,6 +87,7 @@ public class JobController : ControllerBase
     /// Мягкое удаление задачи
     /// </summary>
     [HttpDelete("{id}")]
+    [Authorize]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
     public IActionResult Delete(Guid id)
@@ -95,13 +100,14 @@ public class JobController : ControllerBase
     /// Назначить исполнителя задачи
     /// </summary>
     [HttpPut("{id}/assign")]
+    [Authorize]
     [ProducesResponseType(204)]
     [ProducesResponseType(400)]
     [ProducesResponseType(404)]
     [ProducesResponseType(409)]
-    public IActionResult Assign(Guid jobId, [FromBody][Required] Guid executorId)
+    public IActionResult Assign(Guid id, [FromBody][Required] Guid executorId)
     {
-        _jobService.AssignExecutor(jobId, executorId);
+        _jobService.AssignExecutor(id, executorId);
         return NoContent();
     }
     
@@ -109,6 +115,7 @@ public class JobController : ControllerBase
     /// Возвращает историю изменения работы
     /// </summary>
     [HttpGet("{id}/history")]
+    [Authorize]
     [ProducesResponseType(typeof(IEnumerable<JobHistoryEventDto>), 200)]
     public IActionResult GetHistory(Guid jobId)
     {

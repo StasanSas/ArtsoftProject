@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NotificationService.Application.Interfaces;
 using NotificationService.Domain;
 using NotificationService.WebApi.Dtos;
@@ -24,6 +25,7 @@ public class NotificationController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     [ProducesResponseType(typeof(Guid), 201)]
     [ProducesResponseType(400)]
     public IActionResult CreateNotification([FromBody] NotificationDto notificationDto)
@@ -38,6 +40,7 @@ public class NotificationController : ControllerBase
     }
 
     [HttpPut("{id}/mark-as-read")]
+    [Authorize]
     [ProducesResponseType(204)]
     [ProducesResponseType(404)]
     public IActionResult MarkAsRead(Guid id)

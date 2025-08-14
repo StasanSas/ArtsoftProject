@@ -34,8 +34,8 @@ public class AuthController : ControllerBase
         var user = new NewUser(authDataDto.Login, authDataDto.Password);
         var hashedPassword = authService.GetHashedPassword(user);
         var userWithHashedPassword = new NewUserWithHashedPassword (authDataDto.Login, hashedPassword);
-        userService.CreateUser(userWithHashedPassword);
-        return NoContent();
+        var idUser = userService.CreateUser(userWithHashedPassword);
+        return Ok(new { Token = idUser });
     }
     
     [HttpPost("login")]

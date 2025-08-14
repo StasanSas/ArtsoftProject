@@ -13,9 +13,9 @@ public class UserService : IUserService
         _userDbContext = userDbContext;
     }
 
-    public void CreateUser(NewUserWithHashedPassword  user)
+    public Guid CreateUser(NewUserWithHashedPassword  user)
     {
-        _userDbContext.CreateUser(user);
+        return _userDbContext.CreateUser(user);
     }
 
     public bool TryGetUserInDb(string loginUser, out UserWithHashedPassword user)

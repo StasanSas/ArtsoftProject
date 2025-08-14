@@ -48,12 +48,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidIssuer = "AuthService",
-            ValidateAudience = true,
-            ValidAudience = "ApiService",
+            ValidateAudience = false,
+            ValidateIssuer = false,
             ValidateLifetime = true,
-            ValidateIssuerSigningKey = true
+            ValidateIssuerSigningKey = true,
             // IssuerSigningKey позже создадим т.к. нужен сервис
         };
     });

@@ -4,7 +4,7 @@ namespace AuthService.Application.Interfaces;
 
 public interface IUserService
 {
-    public void CreateUser(NewUserWithHashedPassword  user);
+    public Guid CreateUser(NewUserWithHashedPassword  user);
 
     public bool TryGetUserInDb(string loginUser, out UserWithHashedPassword  user);
 }

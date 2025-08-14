@@ -162,9 +162,9 @@ public class JobDbContext : IJobDbContext
     public void AssignExecutor(Guid jobId, Guid executorId)
     {
         const string sql = @"
-        INSERT INTO jobExecutors (JobId, WorkerId)
+        INSERT INTO job_executors (job_id, worker_id)
         VALUES (@JobId, @WorkerId)
-        ON CONFLICT (JobId, WorkerId) DO NOTHING";
+        ON CONFLICT (job_id, worker_id) DO NOTHING";
 
         using (var connection = new NpgsqlConnection(_connectionString))
         {
