@@ -23,7 +23,7 @@ public class SignalRService
     private void InitializeConnection()
     {
         _connection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:7091/notificationHub", options =>
+            .WithUrl("https://localhost:7114/notificationHub", options =>
             {
                 options.AccessTokenProvider = () => Task.FromResult(_jwtToken);
                 options.CloseTimeout = TimeSpan.FromSeconds(10);
@@ -57,7 +57,7 @@ public class SignalRService
             
         var userId = principal.FindFirst(ClaimTypes.NameIdentifier);
         var username = principal.FindFirst(ClaimTypes.Name);
-        Console.WriteLine($"Ошибка подключения: {userId.Value}");
+        Console.WriteLine($"UserId = {userId.Value}");
     }
 
     public async Task StartAsync()

@@ -24,7 +24,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("GatewayCorsPolicy", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.SetIsOriginAllowed(_ => true)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials(); 
@@ -46,7 +46,8 @@ app.Use(async (context, next) =>
     
     if (context.Request.Method == "GET" && cache.TryGetValue(cacheKey, out var cachedResponse))
     {
-        await context.Response.WriteAsJsonAsync(cachedResponse);
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync((string)cachedResponse);
         return;
     }
     
